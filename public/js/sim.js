@@ -90,14 +90,14 @@ export class Simulation {
   /**
    * @param {object} deps graph, fleet, map və dispatch asılılıqları
    */
-  constructor({ graph, fleet, map, dispatcher, driverCount = 9 }) {
+  constructor({ graph, fleet, map, dispatcher, driverCount = 12 }) {
     this.graph = graph;
     this.fleet = fleet;
     this.map = map;
     this.dispatcher = dispatcher;
 
     this.timeScale = 7; // simulyasiya real vaxtdan sürətlidir
-    this.orderIntervalMs = 4500;
+    this.orderIntervalMs = 5200;
     this.maxPendingOrders = 4;
     this.running = false;
 
@@ -225,6 +225,20 @@ export class Simulation {
     requestAnimationFrame(this.#loop);
   };
 
+  /**
+   * Verilmiş məsafə aralığında təsadüfi node seçir — şəhərdaxili gediş
+   * məsafəsini real saxlayır ki, flot bir neçə uzun səfərdə ilişib qalmasın.
+   */
+  #nearbyNode(lng, lat, minMeters, maxMeters) {
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const candidate = this.graph.randomNode();
+      const [cLng, cLat] = this.graph.nodes[candidate];
+      const d = haversine([lng, lat], [cLng, cLat]);
+      if (d >= minMeters && d <= maxMeters) return candidate;
+    }
+    return this.graph.randomNode();
+  }
+
   #pendingCount() {
     let n = 0;
     for (const o of this.orders.values()) if (o.status === "pending") n++;
@@ -329,7 +343,7 @@ export class Simulation {
     const cancels = isFraud ? 2 + Math.floor(Math.random() * 4) : Math.random() < 0.15 ? 1 : 0;
 
     const landmark = nearestLandmark(lng, lat);
-    const dropoffNode = this.graph.randomNode();
+    const dropoffNode = this.#nearbyNode(lng, lat, 1200, 3800);
 
     const order = {
       id: `O${++this.orderCounter}`,
