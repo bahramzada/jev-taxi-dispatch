@@ -51,6 +51,7 @@ const jev = new TypeSafeClient({ apiKey: process.env.JEV_API_KEY });
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/data", express.static(path.join(__dirname, "data")));
 
 /** Sürücü siyahısını hər iki model üçün eyni mətnə çevirir */
 function driverCriteria(drivers) {
