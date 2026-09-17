@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { TypeSafeClient } from "@typesafe-ai/sdk";
+import { Agent, fetch as undiciFetch } from "undici";
 
 dotenv.config();
 
@@ -46,7 +47,27 @@ if (!LLM_ENABLED) {
   console.warn("XƏBƏRDARLIQ: OPENROUTER_API_KEY yoxdur — LLM müqayisəsi deaktivdir.");
 }
 
-const jev = new TypeSafeClient({ apiKey: process.env.JEV_API_KEY });
+/**
+ * Hər iki model üçün eyni keep-alive agent.
+ *
+ * Standart bağlantı bir neçə saniyə boşdan sonra bağlanır; sifarişlər arasında
+ * 4-5 saniyə fasilə olduğu üçün hər çağırış yenidən TLS əl sıxması ödəyirdi və
+ * ölçülən gecikməyə ~800ms əlavə edirdi. İsti bağlantı həm real istehsal
+ * quruluşudur, həm də müqayisəni ədalətli saxlayır — parametrlər eynidir.
+ */
+const keepAliveAgent = new Agent({
+  keepAliveTimeout: 60_000,
+  keepAliveMaxTimeout: 180_000,
+  connections: 8,
+});
+
+const warmFetch = (url, options = {}) =>
+  undiciFetch(url, { ...options, dispatcher: keepAliveAgent });
+
+const jev = new TypeSafeClient({
+  apiKey: process.env.JEV_API_KEY,
+  fetch: warmFetch,
+});
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -217,7 +238,7 @@ function validateLlm(parsed, drivers) {
 async function callLlm(order, drivers) {
   const started = performance.now();
 
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const res = await warmFetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,

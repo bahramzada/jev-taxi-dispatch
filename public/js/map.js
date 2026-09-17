@@ -47,8 +47,56 @@ export async function createMap(container) {
 
   applyNightTheme(map);
   add3dBuildings(map);
+  addRouteLayers(map);
 
   return map;
+}
+
+const ROUTE_SOURCE = "active-routes";
+
+/** Təyin edilmiş sürücülərin marşrutları üçün işıqlı xətt qatları */
+function addRouteLayers(map) {
+  map.addSource(ROUTE_SOURCE, {
+    type: "geojson",
+    data: { type: "FeatureCollection", features: [] },
+  });
+
+  const colorByState = [
+    "match",
+    ["get", "state"],
+    "pickup", "#fbbf24",
+    "busy", "#e879f9",
+    "#22d3ee",
+  ];
+
+  map.addLayer({
+    id: "route-glow",
+    type: "line",
+    source: ROUTE_SOURCE,
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-color": colorByState,
+      "line-width": ["interpolate", ["linear"], ["zoom"], 12, 5, 17, 16],
+      "line-blur": 7,
+      "line-opacity": 0.4,
+    },
+  });
+
+  map.addLayer({
+    id: "route-line",
+    type: "line",
+    source: ROUTE_SOURCE,
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-color": colorByState,
+      "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.4, 17, 3.4],
+      "line-opacity": 0.95,
+    },
+  });
+}
+
+export function setActiveRoutes(map, features) {
+  map.getSource(ROUTE_SOURCE)?.setData({ type: "FeatureCollection", features });
 }
 
 function applyNightTheme(map) {

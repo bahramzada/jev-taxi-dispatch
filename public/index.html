@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JEV Dispatch — Bakı</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- ============ YÜKLƏMƏ / BAŞLANĞIC EKRANI ============ -->
+<div class="splash" id="splash">
+  <div class="splash-card">
+    <div class="splash-tag">System One · canlı demo</div>
+    <h1>JEV Dispatch<span class="splash-city">Bakı</span></h1>
+    <p class="splash-lead">
+      Bakının real xəritəsi üzərində taksi dispetçerliyi. Hər sifariş gələndə
+      <strong>JEV</strong> modeli bir çağırışda dörd qərar verir: hansı sürücü,
+      nə qədər təcili, saxta sifarişdir ya yox, hansı xidmət tipi.
+    </p>
+
+    <div class="splash-grid">
+      <div class="splash-item">
+        <span class="splash-num">4</span>
+        <span class="splash-label">paralel qərar / sifariş</span>
+      </div>
+      <div class="splash-item">
+        <span class="splash-num">~370<em>ms</em></span>
+        <span class="splash-label">tipik cavab müddəti</span>
+      </div>
+      <div class="splash-item">
+        <span class="splash-num">16.7<em>k</em></span>
+        <span class="splash-label">real yol node-u</span>
+      </div>
+    </div>
+
+    <div class="splash-status" id="splashStatus">Yol şəbəkəsi yüklənir…</div>
+    <button class="btn btn-primary btn-lg" id="startBtn" disabled>Simulyasiyanı başlat</button>
+    <button class="btn btn-ghost btn-sm" id="splashLearnBtn">Necə işləyir?</button>
+  </div>
+</div>
+
+<!-- ============ ÜST PANEL ============ -->
+<header class="topbar" id="topbar">
+  <div class="brand">
+    <span class="brand-mark">JEV</span>
+    <span class="brand-sep"></span>
+    <span class="brand-sub">Dispatch · Bakı</span>
+    <span class="live-dot" id="liveDot"></span>
+  </div>
+
+  <div class="topbar-controls">
+    <label class="switch" title="Eyni sifariş paralel olaraq ənənəvi LLM-ə də göndərilir">
+      <input type="checkbox" id="compareToggle" />
+      <span class="switch-track"><span class="switch-thumb"></span></span>
+      <span class="switch-label">LLM müqayisəsi</span>
+    </label>
+
+    <div class="speed-control">
+      <span class="speed-label">sürət</span>
+      <input type="range" id="speedRange" min="1" max="14" step="1" value="7" />
+      <span class="speed-value" id="speedValue">7×</span>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" id="learnBtn">Necə işləyir</button>
+    <button class="btn btn-ghost btn-sm" id="pauseBtn">Dayandır</button>
+  </div>
+</header>
+
+<!-- ============ SAĞ PANEL ============ -->
+<aside class="sidebar" id="sidebar">
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Model müqayisəsi</h2>
+      <span class="panel-hint" id="compareHint">yalnız JEV işləyir</span>
+    </div>
+
+    <div class="versus">
+      <div class="versus-col versus-jev">
+        <div class="versus-name">JEV</div>
+        <div class="versus-metric" id="jevMedian">—</div>
+        <div class="versus-unit">median ms · son 25</div>
+        <div class="versus-rows">
+          <div><span>p95</span><b id="jevP95">—</b></div>
+          <div><span>qərar</span><b id="jevCalls">0</b></div>
+          <div><span>sxem xətası</span><b id="jevIssues">0</b></div>
+          <div><span>xərc</span><b id="jevCost">$0</b></div>
+        </div>
+      </div>
+
+      <div class="versus-col versus-llm" id="llmCol">
+        <div class="versus-name" id="llmName">LLM</div>
+        <div class="versus-metric" id="llmMedian">—</div>
+        <div class="versus-unit">median ms · son 25</div>
+        <div class="versus-rows">
+          <div><span>p95</span><b id="llmP95">—</b></div>
+          <div><span>qərar</span><b id="llmCalls">0</b></div>
+          <div><span>sxem xətası</span><b id="llmIssues">0</b></div>
+          <div><span>xərc</span><b id="llmCost">$0</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict">Müqayisəni açın ki, hər iki model eyni sifarişlərlə ölçülsün.</div>
+  </section>
+
+  <section class="panel panel-grow">
+    <div class="panel-head">
+      <h2>Qərar axını</h2>
+      <span class="panel-hint" id="decisionCount">0 qərar</span>
+    </div>
+    <div class="decision-stream" id="decisionStream">
+      <div class="stream-empty">Sifarişlər gözlənilir…</div>
+    </div>
+  </section>
+
+</aside>
+
+<!-- ============ SOL ALT: VƏZİYYƏT ============ -->
+<div class="statusbar" id="statusbar">
+  <div class="status-group">
+    <div class="status-item">
+      <span class="status-num" id="activeOrders">0</span>
+      <span class="status-label">aktiv sifariş</span>
+    </div>
+    <div class="status-item">
+      <span class="status-num status-warn" id="manualCount">0</span>
+      <span class="status-label">əl ilə yoxlama</span>
+    </div>
+    <div class="status-item">
+      <span class="status-num status-danger" id="fraudCount">0</span>
+      <span class="status-label">bloklanan saxta</span>
+    </div>
+    <div class="status-item">
+      <span class="status-num status-ok" id="completedCount">0</span>
+      <span class="status-label">tamamlanan</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><i class="dot dot-idle"></i>boş</span>
+    <span class="legend-item"><i class="dot dot-pickup"></i>sifarişə gedir</span>
+    <span class="legend-item"><i class="dot dot-busy"></i>sərnişinlə</span>
+  </div>
+</div>
+
+<!-- ============ İZAHAT PANELİ ============ -->
+<div class="drawer" id="drawer">
+  <div class="drawer-inner">
+    <button class="drawer-close" id="drawerClose">✕</button>
+    <h2>Bu demo necə işləyir?</h2>
+
+    <h3>1. Xəritə və hərəkət</h3>
+    <p>
+      Xəritə — OpenStreetMap məlumatı üzərində qurulmuş Bakının real küçələridir.
+      Taksilər uydurma xətlərlə deyil, <strong>16,700 node-luq real yol qrafında</strong>
+      A* alqoritmi ilə hesablanmış marşrutlarla hərəkət edir.
+    </p>
+
+    <h3>2. Hər sifarişdə bir çağırış, dörd qərar</h3>
+    <p>Sifariş yarananda JEV-ə bir sorğuda dörd sual paralel göndərilir:</p>
+    <ul>
+      <li><code>surucu</code> — <b>Choice</b>: ən yaxın 4 namizəd arasından seçim</li>
+      <li><code>tecililik</code> — <b>Score</b>: sərnişinin mesajına görə 0–3 şkalası</li>
+      <li><code>saxta_sifaris</code> — <b>Noul</b>: saxta sifariş ehtimalı (0–1)</li>
+      <li><code>xidmet_tipi</code> — <b>Choice</b>: standart / komfort / yük</li>
+    </ul>
+
+    <h3>3. Ehtimala görə marşrutlaşdırma</h3>
+    <p>
+      Qapı saxta sifariş ehtimalına qoyulub, çünki risk oradadır:
+      <span class="tag tag-danger">≥ 0.7</span> sifariş bloklanır,
+      <span class="tag tag-warn">0.4 – 0.7</span> insan yoxlamasına düşür,
+      <span class="tag tag-ok">&lt; 0.4</span> avtomatik təyinat.
+    </p>
+    <p>
+      Sürücü seçimindəki <b>confidence</b> isə bloklama səbəbi deyil: iki sürücü
+      eyni məsafədə olanda aşağı əminlik normaldır və hər iki seçim doğrudur —
+      belə hallar sadəcə <span class="tag">yaxın nəticə</span> kimi işarələnir.
+    </p>
+
+    <h3>4. Müqayisə necə aparılır</h3>
+    <p>
+      "LLM müqayisəsi" açılanda eyni sifariş <strong>eyni anda</strong> hər iki modelə göndərilir —
+      eyni state, eyni sual mətnləri. LLM-ə ədalətli şans vermək üçün
+      <code>json_schema</code> structured output və <code>temperature: 0</code> istifadə olunur,
+      yəni formatlaşdırmaya görə uduzmur.
+    </p>
+    <p class="note">
+      Metodologiya: sorğular növbə ilə göndərilir — eyni anda çoxlu sorğu uçuşda olanda
+      ölçülən gecikmə şəbəkə növbəsindən şişir və müqayisəni təhrif edir. Panel medianı
+      son 25 sorğu üzrə hesablanır, ona görə ilk (soyuq) çağırış nəticəni uzun müddət
+      təhrif etmir. LLM-in gecikməsinə OpenRouter marşrutlaşdırma vaxtı da daxildir.
+      Ölçmələr sizin brauzerinizdən, cari şəbəkə şəraitində aparılır — rəqəmlər sizin
+      nəticələrinizdir, mənim iddiam deyil.
+    </p>
+
+    <h3>5. Texnologiya</h3>
+    <p>
+      MapLibre GL JS · three.js · OpenFreeMap · OpenStreetMap (Overpass) ·
+      Node.js + Express · <code>@typesafe-ai/sdk</code> · OpenRouter
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>
