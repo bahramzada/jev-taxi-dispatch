@@ -1,0 +1,19 @@
+{
+  "name": "jev-taxi-dispatch",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bakı xəritəsi üzərində real-vaxt taksi dispetçerlik simulyasiyası — TypeSafe JEV (System One) modeli ilə",
+  "scripts": {
+    "start": "node server.js",
+    "fetch-roads": "node scripts/fetch-roads.mjs"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
