@@ -1,4 +1,5 @@
 import express from "express";
+import compression from "compression";
 import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -70,6 +71,8 @@ const jev = new TypeSafeClient({
 });
 
 const app = express();
+// Yol qrafı təkbaşına 804 KB-dır və sıxılmadan göndərmək ilk açılışı uzadır
+app.use(compression());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/data", express.static(path.join(__dirname, "data")));

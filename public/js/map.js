@@ -43,13 +43,36 @@ export async function createMap(container) {
 
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
 
-  await new Promise((resolve) => map.once("load", resolve));
+  await waitForLoad(map);
 
   applyNightTheme(map);
   add3dBuildings(map);
   addRouteLayers(map);
 
   return map;
+}
+
+const LOAD_TIMEOUT_MS = 20_000;
+
+/**
+ * `load` hadisəsi baş verməsə səhifə əbədi gözləyir və istifadəçi heç bir xəta
+ * görmür. Limit qoyuruq ki, səssiz ilişmə anlaşılan mesaja çevrilsin.
+ */
+function waitForLoad(map) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(
+        new Error(
+          "Xəritə 20 saniyə ərzində yüklənmədi. Şəbəkə bağlantısını yoxlayıb səhifəni yeniləyin."
+        )
+      );
+    }, LOAD_TIMEOUT_MS);
+
+    map.once("load", () => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
 }
 
 const ROUTE_SOURCE = "active-routes";
