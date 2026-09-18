@@ -9,7 +9,7 @@ sürücü təyin olunur, saxta sifariş bloklanır, taksi real küçələrlə yo
 
 [![Node](https://img.shields.io/badge/Node.js-20+-3c873a?logo=node.js&logoColor=white)](https://nodejs.org)
 [![MapLibre](https://img.shields.io/badge/MapLibre_GL-6.10-1e5cb3?logo=maplibre&logoColor=white)](https://maplibre.org)
-[![three.js](https://img.shields.io/badge/three.js-r186-000000?logo=three.js&logoColor=white)](https://threejs.org)
+[![three.js](https://img.shields.io/badge/three.js-r186-049ef4)](https://threejs.org)
 [![JEV](https://img.shields.io/badge/JEV-System_One-22d3ee)](https://docs.typesafe.ai)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -144,18 +144,18 @@ ekran yazısı və demo üçün faydalıdır.
 ## Necə qurulub
 
 ```
-server.js                Express — JEV və OpenRouter proxy-si, ədalətli ölçmə
+server.js              Express — model proxy-si və ölçmə
 scripts/
-  fetch-roads.mjs        Overpass API-dən yol şəbəkəsinin bir dəfəlik çıxarışı
-  shots.mjs              Puppeteer ilə demo görüntüləri
-data/baku-roads.json     Yol qrafı — 16,700 node, 25,128 kənar (OSM, ODbL)
+  fetch-roads.mjs      OSM-dən yol şəbəkəsinin çıxarışı
+  shots.mjs            Puppeteer ilə demo görüntüləri
+data/baku-roads.json   Yol qrafı — 16,700 node (OSM, ODbL)
 public/js/
-  graph.js               Məkan indeksi və A* marşrutlaşdırma
-  map.js                 MapLibre, gecə teması, 3D bina ekstruziyaları
-  fleet3d.js             three.js custom layer — taksi modelləri və mayaklar
-  sim.js                 Simulyasiya döngüsü, sifarişlər, qərarın tətbiqi
-  dispatch.js            API çağırışları, növbə, statistika
-  hud.js                 Panellər, qərar axını, sayğaclar
+  graph.js             Məkan indeksi və A* marşrutlaşdırma
+  map.js               MapLibre, gecə teması, 3D binalar
+  fleet3d.js           three.js layer — taksilər və mayaklar
+  sim.js               Simulyasiya döngüsü və qərarın tətbiqi
+  dispatch.js          API çağırışları, növbə, statistika
+  hud.js               Panellər, qərar axını, sayğaclar
 ```
 
 **Xəritə** — MapLibre GL JS üzərində [OpenFreeMap](https://openfreemap.org) "dark" stili
