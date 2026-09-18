@@ -4,7 +4,7 @@
 
 **Bakının real xəritəsi üzərində real-vaxt taksi dispetçerlik simulyasiyası**
 
-Hər sifarişdə [JEV](https://docs.typesafe.ai/introduction) (TypeSafe System One) modeli bir çağırışda dörd struktur qərar verir —
+Hər sifarişdə [JEV](https://docs.typesafe.ai/introduction) (TypeSafe System One) modeli bir çağırışda dörd struktur qərar verir -
 sürücü təyin olunur, saxta sifariş bloklanır, taksi real küçələrlə yola düşür.
 
 [![Node](https://img.shields.io/badge/Node.js-20+-3c873a?logo=node.js&logoColor=white)](https://nodejs.org)
@@ -15,13 +15,13 @@ sürücü təyin olunur, saxta sifariş bloklanır, taksi real küçələrlə yo
 
 </div>
 
-![JEV Dispatch — əsas panel](docs/02-dispatch.png)
+![JEV Dispatch - əsas panel](docs/02-dispatch.png)
 
 ---
 
 ## Nədir bu?
 
-JEV mətn yaratmır — tipli dəyər və ehtimal paylanması qaytarır. Dispetçerlik bu model üçün
+JEV mətn yaratmır - tipli dəyər və ehtimal paylanması qaytarır. Dispetçerlik bu model üçün
 təbii sahədir, çünki qərarlar kiçik, təkrarlanan və struktur olur.
 
 Sifariş yaranan kimi modelə **bir sorğuda dörd sual** gedir və hamısı paralel qiymətləndirilir:
@@ -52,7 +52,7 @@ hər iki seçim doğrudur, belə hallar sadəcə "yaxın nəticə" kimi işarəl
 
 ## Ölçülmüş nəticələr
 
-Canlı sessiyadan — hər iki model eyni sifarişlərlə, eyni şəraitdə:
+Canlı sessiyadan - hər iki model eyni sifarişlərlə, eyni şəraitdə:
 
 <table>
 <tr><th align="left"></th><th>JEV</th><th>Gemini 3.5 Flash Lite</th></tr>
@@ -65,26 +65,26 @@ Canlı sessiyadan — hər iki model eyni sifarişlərlə, eyni şəraitdə:
 
 > **Sxem pozuntusu haqqında:** bunlar iki fərqli sıfırdır. LLM-də `json_schema` structured output
 > işlədiyi üçün, JEV-də isə yanlış tip qaytarmaq mümkün olmadığı üçün. Repoda LLM cavablarını
-> yoxlayan validator var ([`server.js`](server.js) → `validateLlm`) — mövcud olmayan sürücü ID-si,
+> yoxlayan validator var ([`server.js`](server.js) → `validateLlm`) - mövcud olmayan sürücü ID-si,
 > diapazondan kənar bal və sair üçün. JEV tərəfə belə bir şeyə ehtiyac qalmadı.
 
 <details>
-<summary><b>Metodologiya</b> — rəqəmlərin ədalətli olması üçün nə edilib</summary>
+<summary><b>Metodologiya</b> - rəqəmlərin ədalətli olması üçün nə edilib</summary>
 
 <br>
 
 - Hər iki model **eyni state, eyni sual mətnləri** və eyni anda alır
 - LLM-ə `json_schema` structured output və `temperature: 0` verilir ki, formatlaşdırmaya görə uduzmasın
 - Hər iki model **eyni keep-alive HTTP agent-indən** istifadə edir
-- Sorğular növbə ilə gedir — eyni anda çoxlu sorğu uçuşda olanda ölçmə şəbəkə növbəsindən şişir
+- Sorğular növbə ilə gedir - eyni anda çoxlu sorğu uçuşda olanda ölçmə şəbəkə növbəsindən şişir
 - Panel medianı son 25 sorğu üzrədir, soyuq başlanğıc nəticəni uzun müddət təhrif etmir
 - LLM gecikməsinə OpenRouter marşrutlaşdırma vaxtı daxildir
 
 **Keep-alive niyə vacibdir:** ilk ölçmələrdə JEV medianı 1200ms çıxırdı. Səbəb modeldə deyil,
-bağlantıda idi — sifarişlər arasında 4–5 saniyə fasilə olanda HTTP bağlantısı bağlanırdı və hər
+bağlantıda idi - sifarişlər arasında 4–5 saniyə fasilə olanda HTTP bağlantısı bağlanırdı və hər
 çağırış təzədən TLS əl sıxması ödəyirdi. Keep-alive agent-dən sonra median 361ms-ə düşdü.
 
-Rəqəmlər sizin şəbəkənizdən asılıdır — layihəni işə salıb öz nəticənizi görə bilərsiniz.
+Rəqəmlər sizin şəbəkənizdən asılıdır - layihəni işə salıb öz nəticənizi görə bilərsiniz.
 
 </details>
 
@@ -94,7 +94,7 @@ Rəqəmlər sizin şəbəkənizdən asılıdır — layihəni işə salıb öz n
 
 <table>
 <tr>
-<td width="50%"><img src="docs/03-closeup.png" alt="Yaxın plan — 3D binalar və taksilər"></td>
+<td width="50%"><img src="docs/03-closeup.png" alt="Yaxın plan - 3D binalar və taksilər"></td>
 <td width="50%"><img src="docs/04-explainer.png" alt="İzahat paneli"></td>
 </tr>
 <tr>
@@ -125,7 +125,7 @@ npm start
 | Dəyişən | Tələb olunur | Təyinat |
 | :--- | :---: | :--- |
 | `JEV_API_KEY` | bəli | [console.typesafe.ai](https://console.typesafe.ai/settings/keys) |
-| `OPENROUTER_API_KEY` | xeyr | LLM müqayisəsi üçün — olmasa müqayisə sadəcə deaktiv olur |
+| `OPENROUTER_API_KEY` | xeyr | LLM müqayisəsi üçün - olmasa müqayisə sadəcə deaktiv olur |
 | `LLM_MODEL` | xeyr | Standart: `google/gemini-3.5-flash-lite` |
 | `PORT` | xeyr | Standart: `3100` |
 
@@ -136,7 +136,7 @@ npm run fetch-roads   # yol şəbəkəsini OSM-dən yenidən çıxarır
 npm run shots         # demo görüntülərini çəkir (server işlək olmalıdır)
 ```
 
-URL parametrləri: `?auto=1` simulyasiyanı özü başladır, `?compare=1` müqayisəni açır —
+URL parametrləri: `?auto=1` simulyasiyanı özü başladır, `?compare=1` müqayisəni açır -
 ekran yazısı və demo üçün faydalıdır.
 
 ---
@@ -144,28 +144,28 @@ ekran yazısı və demo üçün faydalıdır.
 ## Necə qurulub
 
 ```
-server.js              Express — model proxy-si və ölçmə
+server.js              Express - model proxy-si və ölçmə
 scripts/
   fetch-roads.mjs      OSM-dən yol şəbəkəsinin çıxarışı
   shots.mjs            Puppeteer ilə demo görüntüləri
-data/baku-roads.json   Yol qrafı — 16,700 node (OSM, ODbL)
+data/baku-roads.json   Yol qrafı - 16,700 node (OSM, ODbL)
 public/js/
   graph.js             Məkan indeksi və A* marşrutlaşdırma
   map.js               MapLibre, gecə teması, 3D binalar
-  fleet3d.js           three.js layer — taksilər və mayaklar
+  fleet3d.js           three.js layer - taksilər və mayaklar
   sim.js               Simulyasiya döngüsü və qərarın tətbiqi
   dispatch.js          API çağırışları, növbə, statistika
   hud.js               Panellər, qərar axını, sayğaclar
 ```
 
-**Xəritə** — MapLibre GL JS üzərində [OpenFreeMap](https://openfreemap.org) "dark" stili
+**Xəritə** - MapLibre GL JS üzərində [OpenFreeMap](https://openfreemap.org) "dark" stili
 (API açarı tələb etmir). Bina hündürlükləri OpenMapTiles sxemindəki `render_height` sahəsindən gəlir.
 
-**Taksilər** — three.js custom layer daxilində proseduralla qurulmuş low-poly modellər, hazır asset yoxdur.
+**Taksilər** - three.js custom layer daxilində proseduralla qurulmuş low-poly modellər, hazır asset yoxdur.
 Mövqe Mercator koordinatlarına çevrilir, ölçü zoom-a görə tənzimlənir. Xəritə həndəsəsi onları
 örtməsin deyə render-dən əvvəl dərinlik buferi təmizlənir.
 
-**Marşrutlar** — taksilər düz xətlə deyil, real yol qrafında A* ilə hesablanmış marşrutlarla hərəkət edir.
+**Marşrutlar** - taksilər düz xətlə deyil, real yol qrafında A* ilə hesablanmış marşrutlarla hərəkət edir.
 Marşrutlaşdırma brauzerdə işləyir, xarici API limiti yoxdur.
 
 ---
@@ -175,7 +175,7 @@ Marşrutlaşdırma brauzerdə işləyir, xarici API limiti yoxdur.
 - Yol şəbəkəsi və xəritə: © OpenStreetMap contributors ([ODbL](https://www.openstreetmap.org/copyright))
 - Vektor tile-lar: [OpenFreeMap](https://openfreemap.org) / OpenMapTiles
 - Model sənədləri: [docs.typesafe.ai](https://docs.typesafe.ai/introduction)
-- Sifariş məlumatları simulyasiyadır — real sərnişin və ya sürücü məlumatı istifadə olunmur
+- Sifariş məlumatları simulyasiyadır - real sərnişin və ya sürücü məlumatı istifadə olunmur
 
 ## Lisenziya
 
