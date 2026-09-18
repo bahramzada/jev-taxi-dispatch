@@ -6,7 +6,8 @@
   "description": "Bakı xəritəsi üzərində real-vaxt taksi dispetçerlik simulyasiyası — TypeSafe JEV (System One) modeli ilə",
   "scripts": {
     "start": "node server.js",
-    "fetch-roads": "node scripts/fetch-roads.mjs"
+    "fetch-roads": "node scripts/fetch-roads.mjs",
+    "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
     "@typesafe-ai/sdk": "^0.6.0",
@@ -16,5 +17,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.11.0"
   }
 }

@@ -8,6 +8,8 @@ sürücü təyin olunur, saxta sifariş bloklanır, taksi real küçələrlə yo
 Eyni sifarişlər istəyə görə paralel olaraq ənənəvi bir LLM-ə də göndərilir —
 gecikmə, xərc və sxem etibarlılığı canlı müqayisə olunur.
 
+![JEV Dispatch — əsas panel](docs/02-dispatch.png)
+
 ---
 
 ## Nə göstərir

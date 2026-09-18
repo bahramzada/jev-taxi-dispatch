@@ -48,6 +48,16 @@ async function boot() {
       "ready"
     );
     $("startBtn").disabled = false;
+
+    // ?auto=1 — ekran yazısı və demo üçün özü başlasın, ?compare=1 müqayisəni açır
+    const params = new URLSearchParams(location.search);
+    if (params.get("compare") === "1" && config.llmEnabled) {
+      $("compareToggle").checked = true;
+      $("compareToggle").dispatchEvent(new Event("change"));
+    }
+    if (params.get("auto") === "1") {
+      $("startBtn").click();
+    }
   } catch (err) {
     console.error(err);
     hud.splashStatus(`Xəta: ${err.message}`, "error");
