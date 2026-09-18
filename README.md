@@ -133,7 +133,7 @@ npm start
 
 ```bash
 npm run fetch-roads   # yol şəbəkəsini OSM-dən yenidən çıxarır
-npm run shots         # demo ekran görüntülərini çəkir (server işlək olmalıdır)
+npm run shots         # demo görüntülərini çəkir (server işlək olmalıdır)
 ```
 
 URL parametrləri: `?auto=1` simulyasiyanı özü başladır, `?compare=1` müqayisəni açır —
